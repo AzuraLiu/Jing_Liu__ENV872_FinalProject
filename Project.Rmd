@@ -1,0 +1,293 @@
+---
+output: 
+  pdf_document:
+    keep_tex: yes
+    fig_caption: yes
+    number_sections: yes
+geometry: margin=2.54cm
+title: "Insert title of project here"
+subtitle: "Web address for GitHub repository"
+author: "Name"
+fontsize: 12pt
+mainfont: Times New Roman
+
+---
+
+\newpage
+\tableofcontents 
+\newpage
+\listoftables 
+\newpage
+\listoffigures 
+\newpage
+
+```{r setup, include=FALSE}
+# Set your working directory
+
+# Load your packages
+library(tidyverse)
+library(lubridate)
+library(trend)
+library(forecast)
+library(dataRetrieval)
+library(rvest)
+# Set your ggplot theme
+theme_set(theme_classic())
+```
+
+```{r datasets: Water Resources Discharge}
+#Regular Water Resources
+CapeFearRiverDischarge <- readNWISdv(siteNumbers = "02096500",
+                                  parameterCd = "00060", # discharge (ft3/s)
+                                  startDate = "1990-01-01",
+                                  endDate = "2021-12-31")
+names(CapeFearRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
+c(min(CapeFearRiverDischarge$Date), max(CapeFearRiverDischarge$Date))
+#"1990-01-01" "2021-12-31"
+
+FlatRiverDischarge <- readNWISdv(siteNumbers = "02085500",
+                                  parameterCd = "00060", # discharge (ft3/s)
+                                  startDate = "1990-01-01",
+                                  endDate = "2021-12-31")
+names(FlatRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
+c(min(FlatRiverDischarge$Date), max(FlatRiverDischarge$Date))
+#"1990-01-01" "2021-12-31"
+
+LittleRiverDischarge <- readNWISdv(siteNumbers = "0208524975",
+                                  parameterCd = "00060", # discharge (ft3/s)
+                                  startDate = "1990-01-01",
+                                  endDate = "2021-12-31")
+names(LittleRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
+c(min(LittleRiverDischarge$Date), max(LittleRiverDischarge$Date))
+#"1995-10-24" "2021-12-31"
+
+#Emergency Water Resources
+EnoRiverDischarge <- readNWISdv(siteNumbers = "02085070",
+                                  parameterCd = "00060", # discharge (ft3/s)
+                                  startDate = "1990-01-01",
+                                  endDate = "2021-12-31")
+names(EnoRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
+c(min(EnoRiverDischarge$Date), max(EnoRiverDischarge$Date))
+#"1990-01-01" "2021-12-31"
+
+#Surrounding Water Resources (Unused)
+EllerbeCreekDischarge <- readNWISdv(siteNumbers = "0208675010",
+                                  parameterCd = "00060", # discharge (ft3/s)
+                                  startDate = "1990-01-01",
+                                  endDate = "2021-12-31")
+names(EllerbeCreekDischarge)[4:5] <- c("Discharge", "Approval.Code")
+c(min(EllerbeCreekDischarge$Date), max(EllerbeCreekDischarge$Date))
+#"2008-08-01" "2021-12-31"
+
+SandyCreekDischarge <- readNWISdv(siteNumbers = "0209722970",
+                                  parameterCd = "00060", # discharge (ft3/s)
+                                  startDate = "1990-01-01",
+                                  endDate = "2021-12-31")
+names(SandyCreekDischarge)[4:5] <- c("Discharge", "Approval.Code")
+c(min(SandyCreekDischarge$Date), max(SandyCreekDischarge$Date))
+#"2008-08-01" "2021-12-31"
+
+ThirdForkCreekDischarge <- readNWISdv(siteNumbers = "0209725960",
+                                  parameterCd = "00060", # discharge (ft3/s)
+                                  startDate = "1990-01-01",
+                                  endDate = "2021-12-31")
+names(ThirdForkCreekDischarge)[4:5] <- c("Discharge", "Approval.Code")
+c(min(ThirdForkCreekDischarge$Date), max(ThirdForkCreekDischarge$Date))
+#"2017-06-16" "2021-12-31"
+
+```
+
+```{r Groundwater}
+GroundParams <- whatNWISdata(siteNumbers = "355944079013401")
+DurhamGroundwater <- readNWISdv(siteNumbers = "355852078572045",
+                                 parameterCd = "62610", # /72019/Groundwater level above NGVD 1929 (feet)
+                                 startDate = "2009-01-01",
+                                 endDate = "2021-12-31")
+names(DurhamGroundwater)[4:5] <- c("Groundwater", "Approval.Code")
+c(min(DurhamGroundwater$Date), max(DurhamGroundwater$Date))
+#
+```
+
+```{r Total Withdrawl}
+#the PSWID of Durham
+durham_pswid = '03-32-010'
+#years with records
+the_years = c(2017:2021)
+
+#Scrap Function
+scrape.totalwithdrawal <- function(the_pswid, the_year){
+  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', 
+                                  the_pswid, '&year=', the_year))
+  
+  water_system_name_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
+  ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
+  avg_daily_use_tag <- '.fancy-table:nth-child(31) th+ td'
+  
+  water_system_name <- the_website %>% html_nodes(water_system_name_tag) %>% html_text()
+  ownership <- the_website %>%   html_nodes(ownership_tag) %>%  html_text()
+  avg_daily_use <- the_website %>% html_nodes(avg_daily_use_tag) %>% html_text()
+  
+  df_withdrawals <- data.frame("Year" = rep(the_year,12),
+                               "Month" = rep(1:12),
+                               "Avg_Daily_Use_mgd" = as.numeric(avg_daily_use)) %>% 
+    mutate(Water_System_name = !!water_system_name,
+         Ownership = !!ownership,
+         Date = my(paste(Month,"-",Year)))
+  
+  print(paste('The Pswid =', the_pswid, ', The Year =', the_year))
+  return(df_withdrawals)
+}
+
+total_withdrawal <- map(the_years, scrape.totalwithdrawal, the_pswid = durham_pswid)
+total_withdrawal <- bind_rows(total_withdrawal)
+```
+
+```{r Total Withdrawal Distribution}
+scrape.totalwithdrawal.distribution <- function(the_pswid, the_year){
+  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', 
+                                  the_pswid, '&year=', the_year))
+  
+  water_system_name_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
+  ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
+  stram_name_tag <- '.fancy-table:nth-child(36) .left:nth-child(1)'
+  avg_daily_use_tag <- '.fancy-table:nth-child(36) .left~ .left+ td'
+  the_numberofdaysused_tag <- '.fancy-table:nth-child(36) td:nth-child(4)'
+  
+  water_system_name <- the_website %>% html_nodes(water_system_name_tag) %>% html_text()
+  ownership <- the_website %>%   html_nodes(ownership_tag) %>%  html_text()
+  stream_name <- the_website %>% html_nodes(stram_name_tag) %>% html_text()
+  avg_daily_use <- the_website %>% html_nodes(avg_daily_use_tag) %>% html_text()
+  the_numberofdaysused <- the_website %>% html_nodes(the_numberofdaysused_tag) %>% html_text()
+  
+  df_withdrawals <- data.frame("Year" = rep(the_year,5),
+                               "Stream_Name" = stream_name,
+                               "Avg_Daily_Use_mgd" = as.numeric(avg_daily_use),
+                               "Number_of_Days_Used" = as.numeric(the_numberofdaysused)) %>% 
+    mutate(Water_System_name = !!water_system_name,
+         Ownership = !!ownership)
+  
+  print(paste('The Pswid =', the_pswid, ', The Year =', the_year))
+  return(df_withdrawals)
+}
+
+total_withdrawal.distribution <- map(2021, scrape.totalwithdrawal.distribution, the_pswid = durham_pswid)
+total_withdrawal.distribution <- bind_rows(total_withdrawal.distribution)
+```
+
+```{r Industry Withdrawl}
+#Water-use industries' sites 
+#https://www.ncwater.org/WUDC/app/WWATR/report
+Brentwood <- "0218-0068"
+CanterburyEstates <- "0218-0086"
+CardensCreek <- "0218-0088"
+FoxRun <- "0218-0199"
+Greymoss <- "0218-0229"
+Hardscrabble <- "0218-0238"
+LakeRidge <- "0218-0313"
+Masonwoods <- "0218-0349"
+RedMountain <- "0218-0460"
+TrappersCreek <- "0218-0608"
+Tyndrum <- "0218-0619"
+Wexford <- "0218-0646"
+WillowHill <- "0218-0658"
+HeatherGlen <- "0378-0038"
+ColvardFarms <- "0427-0001"
+CroasdaileCountryClub <- "0419-0001"
+RougemontQuarry <- "0340-0003"
+Durham.sites <- c(Brentwood, CanterburyEstates, CardensCreek, FoxRun, Greymoss, Hardscrabble, LakeRidge, Masonwoods, RedMountain, TrappersCreek, Tyndrum, Wexford, WillowHill, HeatherGlen, ColvardFarms, CroasdaileCountryClub, RougemontQuarry)
+
+#years with records
+the_years = c(2007:2021)
+
+#Scraping Function
+scrape.industrywithdrawals <- function(the_year, the_facility){
+  #Retrieve the website contents 
+  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/WWATR/report/view/', 
+                                  the_facility, '/', the_year))
+  
+  #Set the element address variables (determined in the previous step)
+  the_registrant_tag <- '.table tr:nth-child(1) td:nth-child(2)'
+  the_facility_name_tag <- 'tr:nth-child(2) th+ .left:nth-child(2)'
+  the_facility_id_tag <- 'tr:nth-child(2) .left~ .left+ td.left'
+  the_data_tag <- '.table:nth-child(7) td:nth-child(7) , .table:nth-child(7) td:nth-child(3)'
+  the_numberofdaysused_tag <- '.table:nth-child(7) th+ td'
+  
+  #Scrape the data items
+  the_registrant <- the_website %>% html_nodes(the_registrant_tag) %>% html_text()
+  the_facility_name <- the_website %>%   html_nodes(the_facility_name_tag) %>%  html_text()
+  the_facility_type <- the_website %>% html_nodes(the_facility_id_tag) %>% html_text()
+  avg_withdrawals <- the_website %>% html_nodes(the_data_tag) %>% html_text()
+  the_numberofdaysused <- the_website %>% html_nodes(the_numberofdaysused_tag) %>% html_text()
+  
+  #Convert to a dataframe
+  df_withdrawals <- data.frame("Year" = rep(the_year,12),
+                               "Month" = rep(1:12),
+                               "Avg_Withdrawals_mgd" = as.numeric(avg_withdrawals),
+                               "Number_of_Days_Used" = as.numeric(the_numberofdaysused)) %>% 
+    mutate(Registrant = !!the_registrant,
+           Facility_name = !!the_facility_name,
+           Facility_type = !!the_facility_type,
+           Date = my(paste(Month,"-",Year)))
+  
+  #Pause for a moment - scraping etiquette
+  #Sys.sleep(1) #uncomment this if you are doing bulk scraping!
+  
+  #Return the dataframe
+  return(df_withdrawals)
+}
+
+industry_withdrawal <- cross2(the_years, Durham.sites) %>% 
+  map(lift(scrape.industrywithdrawals)) %>% 
+  bind_rows()
+```
+
+```{r Precipitation}
+#Precipitation
+PreciParams <- whatNWISdata(siteNumbers = "355852078572045")
+DurhamPrecipitaion <- readNWISdv(siteNumbers = "355852078572045",
+                                 parameterCd = "00065", # precipitation (inches)
+                                 startDate = "2009-01-01",
+                                 endDate = "2021-12-31")
+names(DurhamPrecipitaion)[4:5] <- c("Precipitaion", "Approval.Code")
+c(min(DurhamPrecipitaion$Date), max(DurhamPrecipitaion$Date))
+#
+```
+
+# Rationale and Research Questions
+
+
+
+\newpage
+
+# Dataset Information
+
+
+
+\newpage
+
+# Exploratory Analysis 
+
+
+
+\newpage
+
+# Analysis
+
+
+
+## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed>
+
+## Question 2: 
+
+
+
+
+\newpage
+
+# Summary and Conclusions
+
+
+\newpage
+
+# References
+<add references here if relevant, otherwise delete this section> 

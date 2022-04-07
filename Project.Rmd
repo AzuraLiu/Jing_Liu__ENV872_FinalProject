@@ -275,9 +275,9 @@ c(min(DurhamPrecipitaion$Date), max(DurhamPrecipitaion$Date))
 
 
 
-## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed>
+## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed> Is there a relationship between surface water flow and groundwater levels in Durham region?
 
-## Question 2: 
+## Question 2: How much is surface water affected by municipal withdrawal and precipitation recharge?
 
 
 

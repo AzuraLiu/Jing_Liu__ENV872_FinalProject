@@ -112,7 +112,7 @@ c(min(DurhamGroundwater$Date), max(DurhamGroundwater$Date))
 #the PSWID of Durham
 durham_pswid = '03-32-010'
 #years with records
-the_years = c(2017:2021)
+the_years = c(2018:2021)
 
 #Scrap Function
 scrape.totalwithdrawal <- function(the_pswid, the_year){
@@ -142,20 +142,25 @@ total_withdrawal <- map(the_years, scrape.totalwithdrawal, the_pswid = durham_ps
 total_withdrawal <- bind_rows(total_withdrawal)
 ```
 
-```{r Total Withdrawal Distribution}
-scrape.totalwithdrawal.distribution <- function(the_pswid, the_year){
+```{r Withdrawal Distribution}
+#the PSWID of Durham
+durham_pswid = '03-32-010'
+#years with records
+the_years = c(2018:2021)
+
+scrape.withdrawal.distribution <- function(the_pswid, the_year){
   the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', 
                                   the_pswid, '&year=', the_year))
   
   water_system_name_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
   ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
-  stram_name_tag <- '.fancy-table:nth-child(36) .left:nth-child(1)'
-  avg_daily_use_tag <- '.fancy-table:nth-child(36) .left~ .left+ td'
-  the_numberofdaysused_tag <- '.fancy-table:nth-child(36) td:nth-child(4)'
+  stream_name_tag <- '.fancy-table:nth-child(35) .left:nth-child(1)'
+  avg_daily_use_tag <- '.fancy-table:nth-child(35) .left~ .left+ td'
+  the_numberofdaysused_tag <- '.fancy-table:nth-child(35) td:nth-child(4)'
   
   water_system_name <- the_website %>% html_nodes(water_system_name_tag) %>% html_text()
   ownership <- the_website %>%   html_nodes(ownership_tag) %>%  html_text()
-  stream_name <- the_website %>% html_nodes(stram_name_tag) %>% html_text()
+  stream_name <- the_website %>% html_nodes(stream_name_tag) %>% html_text()
   avg_daily_use <- the_website %>% html_nodes(avg_daily_use_tag) %>% html_text()
   the_numberofdaysused <- the_website %>% html_nodes(the_numberofdaysused_tag) %>% html_text()
   
@@ -170,8 +175,8 @@ scrape.totalwithdrawal.distribution <- function(the_pswid, the_year){
   return(df_withdrawals)
 }
 
-total_withdrawal.distribution <- map(2021, scrape.totalwithdrawal.distribution, the_pswid = durham_pswid)
-total_withdrawal.distribution <- bind_rows(total_withdrawal.distribution)
+withdrawal_distribution <- map(the_years, scrape.withdrawal.distribution, the_pswid = durham_pswid)
+withdrawal_distribution <- bind_rows(withdrawal_distribution)
 ```
 
 ```{r Industry Withdrawl}
@@ -251,6 +256,76 @@ DurhamPrecipitaion <- readNWISdv(siteNumbers = "355852078572045",
 names(DurhamPrecipitaion)[4:5] <- c("Precipitaion", "Approval.Code")
 c(min(DurhamPrecipitaion$Date), max(DurhamPrecipitaion$Date))
 #
+```
+
+```{r Total Wastewater}
+#the PSWID of Durham
+durham_pswid = '03-32-010'
+#years with records
+the_years = c(2018:2021)
+
+scrape.totalwastewater <- function(the_pswid, the_year){
+  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', 
+                                  the_pswid, '&year=', the_year))
+  
+  water_system_name_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
+  ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
+  avg_daily_discharge_tag <- '.fancy-table:nth-child(50) td'
+  
+  water_system_name <- the_website %>% html_nodes(water_system_name_tag) %>% html_text()
+  ownership <- the_website %>%   html_nodes(ownership_tag) %>%  html_text()
+  avg_daily_discharge <- the_website %>% html_nodes(avg_daily_discharge_tag) %>% html_text()
+  
+  df_wastewaters <- data.frame("Year" = rep(the_year,12),
+                               "Month" = rep(1:12),
+                               "Avg_Daily_Use_mgd" = as.numeric(avg_daily_discharge)) %>% 
+    mutate(Water_System_name = !!water_system_name,
+         Ownership = !!ownership,
+         Date = my(paste(Month,"-",Year)))
+  
+  print(paste('The Pswid =', the_pswid, ', The Year =', the_year))
+  return(df_wastewaters)
+}
+
+total_wastewater <- map(the_years, scrape.totalwastewater, the_pswid = durham_pswid)
+total_wastewater <- bind_rows(total_wastewater)
+```
+
+```{r Wastewater Distribution}
+#the PSWID of Durham
+durham_pswid = '03-32-010'
+#years with records
+the_years = c(2018:2021)
+
+scrape.wastewater.distribution <- function(the_pswid, the_year){
+  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', 
+                                  the_pswid, '&year=', the_year))
+  
+  water_system_name_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
+  ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
+  stram_name_tag <- '.fancy-table:nth-child(55) .left:nth-child(6)'
+  basin_name_tag <- '.left:nth-child(7)'
+  avg_daily_discharge_tag <- '.fancy-table:nth-child(55) td:nth-child(4)'
+
+  water_system_name <- the_website %>% html_nodes(water_system_name_tag) %>% html_text()
+  ownership <- the_website %>%   html_nodes(ownership_tag) %>%  html_text()
+  stream_name <- the_website %>% html_nodes(stram_name_tag) %>% html_text()
+  basin_name <- the_website %>% html_nodes(basin_name_tag) %>% html_text()
+  avg_daily_discharge <- the_website %>% html_nodes(avg_daily_discharge_tag) %>% html_text()
+
+  df_wastewater <- data.frame("Year" = rep(the_year,2),
+                               "Recieving_Stream" = stream_name,
+                              "Recieving_Basin" = basin_name,
+                               "Avg_Daily_Discharge_mgd" = as.numeric(avg_daily_discharge)) %>% 
+    mutate(Water_System_name = !!water_system_name,
+         Ownership = !!ownership)
+  
+  print(paste('The Pswid =', the_pswid, ', The Year =', the_year))
+  return(df_wastewater)
+}
+
+wastewater_distribution <- map(the_years, scrape.wastewater.distribution, the_pswid = durham_pswid)
+wastewater_distribution <- bind_rows(wastewater_distribution)
 ```
 
 # Rationale and Research Questions

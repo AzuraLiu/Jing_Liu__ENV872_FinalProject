@@ -44,6 +44,11 @@ CapeFearRiverDischarge <- readNWISdv(siteNumbers = "02096500",
 names(CapeFearRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
 c(min(CapeFearRiverDischarge$Date), max(CapeFearRiverDischarge$Date))
 #"1990-01-01" "2021-12-31"
+CapeFearRiverDischarge_Monthly <- CapeFearRiverDischarge %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+            River = paste("Cape Fear River"))
 
 FlatRiverDischarge <- readNWISdv(siteNumbers = "02085500",
                                   parameterCd = "00060", # discharge (ft3/s)
@@ -52,6 +57,11 @@ FlatRiverDischarge <- readNWISdv(siteNumbers = "02085500",
 names(FlatRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
 c(min(FlatRiverDischarge$Date), max(FlatRiverDischarge$Date))
 #"1990-01-01" "2021-12-31"
+FlatRiverDischarge_Monthly <- FlatRiverDischarge %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+            River = paste("Flat River"))
 
 LittleRiverDischarge <- readNWISdv(siteNumbers = "0208524975",
                                   parameterCd = "00060", # discharge (ft3/s)
@@ -60,6 +70,11 @@ LittleRiverDischarge <- readNWISdv(siteNumbers = "0208524975",
 names(LittleRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
 c(min(LittleRiverDischarge$Date), max(LittleRiverDischarge$Date))
 #"1995-10-24" "2021-12-31"
+LittleRiverDischarge_Monthly <- LittleRiverDischarge %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+            River = paste("Little River"))
 
 #Emergency Water Resources
 EnoRiverDischarge <- readNWISdv(siteNumbers = "02085070",
@@ -69,6 +84,11 @@ EnoRiverDischarge <- readNWISdv(siteNumbers = "02085070",
 names(EnoRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
 c(min(EnoRiverDischarge$Date), max(EnoRiverDischarge$Date))
 #"1990-01-01" "2021-12-31"
+EnoRiverDischarge_Monthly <- EnoRiverDischarge %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+            River = paste("Eno River"))
 
 #Surrounding Water Resources (Unused)
 EllerbeCreekDischarge <- readNWISdv(siteNumbers = "0208675010",
@@ -78,6 +98,11 @@ EllerbeCreekDischarge <- readNWISdv(siteNumbers = "0208675010",
 names(EllerbeCreekDischarge)[4:5] <- c("Discharge", "Approval.Code")
 c(min(EllerbeCreekDischarge$Date), max(EllerbeCreekDischarge$Date))
 #"2008-08-01" "2021-12-31"
+EllerbeCreekDischarge_Monthly <- EllerbeCreekDischarge %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+            River = paste("Ellerbe Creek"))
 
 SandyCreekDischarge <- readNWISdv(siteNumbers = "0209722970",
                                   parameterCd = "00060", # discharge (ft3/s)
@@ -86,6 +111,11 @@ SandyCreekDischarge <- readNWISdv(siteNumbers = "0209722970",
 names(SandyCreekDischarge)[4:5] <- c("Discharge", "Approval.Code")
 c(min(SandyCreekDischarge$Date), max(SandyCreekDischarge$Date))
 #"2008-08-01" "2021-12-31"
+SandyCreekDischarge_Monthly <- SandyCreekDischarge %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+            River = paste("Sandy Creek"))
 
 ThirdForkCreekDischarge <- readNWISdv(siteNumbers = "0209725960",
                                   parameterCd = "00060", # discharge (ft3/s)
@@ -94,6 +124,11 @@ ThirdForkCreekDischarge <- readNWISdv(siteNumbers = "0209725960",
 names(ThirdForkCreekDischarge)[4:5] <- c("Discharge", "Approval.Code")
 c(min(ThirdForkCreekDischarge$Date), max(ThirdForkCreekDischarge$Date))
 #"2017-06-16" "2021-12-31"
+ThirdForkCreekDischarge_Monthly <- ThirdForkCreekDischarge %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+            River = paste("Third Fork Creek"))
 
 ```
 

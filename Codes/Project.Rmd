@@ -365,6 +365,19 @@ wastewater_distribution <- map(the_years, scrape.wastewater.distribution, the_ps
 wastewater_distribution <- bind_rows(wastewater_distribution)
 ```
 
+```{r}
+#Regular Water Resources
+CapeFearRiver_timeseries <- ts(CapeFearRiverDischarge_Monthly$Mean_Discharge_Bymonth, frequency = 12,
+                           start = c(1990, 1, 1), end = c(2021, 12, 1))
+CapeFearRiver_Decomposed <- stl(CapeFearRiver_timeseries, s.window = "periodic")
+plot(CapeFearRiver_Decomposed)
+
+CapeFearRiver_trend <- smk.test(CapeFearRiver_timeseries)
+CapeFearRiver_trend
+summary(CapeFearRiver_trend)
+
+```
+
 # Rationale and Research Questions
 
 

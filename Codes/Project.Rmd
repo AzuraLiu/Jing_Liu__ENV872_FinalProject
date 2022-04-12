@@ -365,8 +365,7 @@ wastewater_distribution <- map(the_years, scrape.wastewater.distribution, the_ps
 wastewater_distribution <- bind_rows(wastewater_distribution)
 ```
 
-```{r}
-#Regular Water Resources
+```{r time-series analysis on Regular Water Resources}
 CapeFearRiver_timeseries <- ts(CapeFearRiverDischarge_Monthly$Mean_Discharge_Bymonth, frequency = 12,
                            start = c(1990, 1, 1), end = c(2021, 12, 1))
 CapeFearRiver_Decomposed <- stl(CapeFearRiver_timeseries, s.window = "periodic")
@@ -375,7 +374,39 @@ plot(CapeFearRiver_Decomposed)
 CapeFearRiver_trend <- smk.test(CapeFearRiver_timeseries)
 CapeFearRiver_trend
 summary(CapeFearRiver_trend)
+#p-value is 0.3233, so there is no trend present in Cape Fear River.
 
+FlatRiver_timeseries <- ts(FlatRiverDischarge_Monthly$Mean_Discharge_Bymonth, frequency = 12,
+                           start = c(1990, 1, 1), end = c(2021, 12, 1))
+FlatRiver_Decomposed <- stl(FlatRiver_timeseries, s.window = "periodic")
+plot(FlatRiver_Decomposed)
+
+FlatRiver_trend <- smk.test(FlatRiver_timeseries)
+FlatRiver_trend
+summary(FlatRiver_trend)
+#p-value is 0.3968, so there is no trend present in Flat River.
+
+LittleRiver_timeseries <- ts(LittleRiverDischarge_Monthly$Mean_Discharge_Bymonth, frequency = 12,
+                           start = c(1990, 1, 1), end = c(2021, 12, 1))
+LittleRiver_Decomposed <- stl(LittleRiver_timeseries, s.window = "periodic")
+plot(LittleRiver_Decomposed)
+
+LittleRiver_trend <- smk.test(LittleRiver_timeseries)
+LittleRiver_trend
+summary(LittleRiver_trend)
+#p-value is 0.4073, so there is no trend present in Little River.
+```
+
+```{r time-series analysis on withdrawals}
+total_withdrawal_timeseries <- ts(total_withdrawal$Avg_Daily_Use_mgd, frequency = 12,
+                           start = c(2018, 1, 1), end = c(2021, 12, 1))
+total_withdrawal_Decomposed <- stl(total_withdrawal_timeseries, s.window = "periodic")
+plot(total_withdrawal_Decomposed)
+
+total_withdrawal_trend <- smk.test(total_withdrawal_timeseries)
+total_withdrawal_trend
+summary(total_withdrawal_trend)
+#p-value is 0.3775, so there is no trend present in Cape Fear River.
 ```
 
 # Rationale and Research Questions

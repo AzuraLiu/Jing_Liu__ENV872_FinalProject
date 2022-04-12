@@ -281,6 +281,13 @@ scrape.industrywithdrawals <- function(the_year, the_facility){
 industry_withdrawal <- cross2(the_years, Durham.sites) %>% 
   map(lift(scrape.industrywithdrawals)) %>% 
   bind_rows()
+
+industry_withdrawal_Monthly <- industry_withdrawal %>%
+  select(Date, Avg_Withdrawals_mgd) %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Avg_Industrial_Withdrawals_mgd = sum(Avg_Withdrawals_mgd))
+
 ```
 
 ```{r Precipitation}
@@ -398,6 +405,7 @@ summary(LittleRiver_trend)
 ```
 
 ```{r time-series analysis on withdrawals}
+#Total Withdrawals
 total_withdrawal_timeseries <- ts(total_withdrawal$Avg_Daily_Use_mgd, frequency = 12,
                            start = c(2018, 1, 1), end = c(2021, 12, 1))
 total_withdrawal_Decomposed <- stl(total_withdrawal_timeseries, s.window = "periodic")
@@ -406,7 +414,9 @@ plot(total_withdrawal_Decomposed)
 total_withdrawal_trend <- smk.test(total_withdrawal_timeseries)
 total_withdrawal_trend
 summary(total_withdrawal_trend)
-#p-value is 0.3775, so there is no trend present in Cape Fear River.
+#p-value is 0.3775, so there is no trend present in Total Withdrawals.
+
+
 ```
 
 # Rationale and Research Questions

@@ -15,11 +15,37 @@ mainfont: Times New Roman
 
 \newpage
 \tableofcontents 
+
+
 \newpage
 \listoftables 
+
+
+
 \newpage
 \listoffigures 
+
+
+
 \newpage
+
+
+# Rationale and Research Questions
+
+#We perform analysis based on the following sub-questions.
+#How is groundwater table related to precipitation?
+#How is groundwater table level related to local river discharge?
+#How is ground water table level related to local withdraws?
+
+\newpage
+
+# Dataset Information
+
+
+
+\newpage
+
+# Exploratory Analysis 
 
 ```{r setup, include=FALSE}
 # Set your working directory
@@ -373,6 +399,11 @@ wastewater_distribution <- map(the_years, scrape.wastewater.distribution, the_ps
 wastewater_distribution <- bind_rows(wastewater_distribution)
 ```
 
+
+\newpage
+
+# Analysis
+
 ```{r time-series analysis on Regular Water Resources}
 CapeFearRiver_timeseries <- ts(CapeFearRiverDischarge_Monthly$Mean_Discharge_Bymonth, frequency = 12,
                            start = c(1990, 1, 1), end = c(2021, 12, 1))
@@ -440,27 +471,6 @@ DurhamPrecipitaion_trend <- smk.test(DurhamGroundwater_timeseries)
 DurhamPrecipitaion_trend
 summary(DurhamPrecipitaion_trend)
 ```
-
-# Rationale and Research Questions
-
-
-
-\newpage
-
-# Dataset Information
-
-
-
-\newpage
-
-# Exploratory Analysis 
-
-
-
-\newpage
-
-# Analysis
-
 
 
 ## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed> Is there a relationship between surface water flow and groundwater levels in Durham region?

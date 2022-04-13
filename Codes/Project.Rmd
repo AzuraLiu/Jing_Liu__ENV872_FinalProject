@@ -59,6 +59,8 @@ library(trend)
 library(forecast)
 library(dataRetrieval)
 library(rvest)
+library(lme4)
+library(lmerTest)
 # Set your ggplot theme
 theme_set(theme_classic())
 ```
@@ -69,7 +71,7 @@ CapeFearRiverDischarge <- readNWISdv(siteNumbers = "02096500",
                                   parameterCd = "00060", # discharge (ft3/s)
                                   startDate = "1990-01-01",
                                   endDate = "2021-12-31")
-names(CapeFearRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
+names(CapeFearRiverDischarge)[4:5] <- c("CapeFear_Discharge", "Approval.Code")
 c(min(CapeFearRiverDischarge$Date), max(CapeFearRiverDischarge$Date))
 #"1990-01-01" "2021-12-31"
 CapeFearRiverDischarge_Monthly <- CapeFearRiverDischarge %>%
@@ -82,7 +84,7 @@ FlatRiverDischarge <- readNWISdv(siteNumbers = "02085500",
                                   parameterCd = "00060", # discharge (ft3/s)
                                   startDate = "1990-01-01",
                                   endDate = "2021-12-31")
-names(FlatRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
+names(FlatRiverDischarge)[4:5] <- c("Flat_Discharge", "Approval.Code")
 c(min(FlatRiverDischarge$Date), max(FlatRiverDischarge$Date))
 #"1990-01-01" "2021-12-31"
 FlatRiverDischarge_Monthly <- FlatRiverDischarge %>%
@@ -95,7 +97,7 @@ LittleRiverDischarge <- readNWISdv(siteNumbers = "0208524975",
                                   parameterCd = "00060", # discharge (ft3/s)
                                   startDate = "1990-01-01",
                                   endDate = "2021-12-31")
-names(LittleRiverDischarge)[4:5] <- c("Discharge", "Approval.Code")
+names(LittleRiverDischarge)[4:5] <- c("Little_Discharge", "Approval.Code")
 c(min(LittleRiverDischarge$Date), max(LittleRiverDischarge$Date))
 #"1995-10-24" "2021-12-31"
 LittleRiverDischarge_Monthly <- LittleRiverDischarge %>%
@@ -162,7 +164,7 @@ ThirdForkCreekDischarge_Monthly <- ThirdForkCreekDischarge %>%
 
 ```{r Groundwater}
 GroundParams <- whatNWISdata(siteNumbers = "355944079013401")
-DurhamGroundwater <- readNWISdv(siteNumbers = "355944079013401",
+DurhamGroundwater <- readNWISdv(siteNumbers = "355944079013401", #Duke Forest
                                  parameterCd = "72019", # /62610/Groundwater level above NGVD 1929 (feet)
                                  statCd = "00002",
                                  startDate = "2014-01-01",
@@ -325,8 +327,8 @@ DurhamPrecipitaion <- readNWISdv(siteNumbers = "355852078572045",
                                  startDate = "2009-01-01",
                                  endDate = "2021-12-31")
 names(DurhamPrecipitaion)[4:5] <- c("Precipitaion_inches", "Approval.Code")
+
 c(min(DurhamPrecipitaion$Date), max(DurhamPrecipitaion$Date))
-#
 ```
 
 ```{r Total Wastewater}
@@ -472,6 +474,42 @@ DurhamPrecipitaion_trend
 summary(DurhamPrecipitaion_trend)
 ```
 
+```{r precipitation and groundwater}
+precip <- DurhamPrecipitaion %>%
+  select(Date, Precipitaion_inches) %>%
+  filter(Date > "2013-12-31")
+groudw <- DurhamGroundwater %>%
+  select(Date, Groundwater_Table_feet) %>%
+  filter(Date > "2013-12-31")
+data1 <- left_join(groudw, precip)
+
+mod1 <- lm(Groundwater_Table_feet ~ Precipitaion_inches, data = data1)
+summary(mod1)
+```
+
+```{r groundwater and river discharge}
+capefear <- CapeFearRiverDischarge %>%
+  select(Date, CapeFear_Discharge) %>%
+  filter(Date > "2013-12-31")
+flat <- FlatRiverDischarge %>%
+  select(Date, Flat_Discharge) %>%
+  filter(Date > "2013-12-31")
+little <- LittleRiverDischarge %>%
+  select(Date, Little_Discharge) %>%
+  filter(Date > "2013-12-31")
+data2 <- left_join(groudw, capefear) %>%
+  left_join(., flat) %>%
+  left_join(., little) 
+
+mod2.1 <- lm(Groundwater_Table_feet ~ CapeFear_Discharge + Flat_Discharge + Little_Discharge, data = data2)
+summary(mod2.1)
+mod2.2 <- update(mod2.1, .~. -CapeFear_Discharge)
+summary(mod2.2)
+```
+
+```{r}
+
+```
 
 ## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed> Is there a relationship between surface water flow and groundwater levels in Durham region?
 

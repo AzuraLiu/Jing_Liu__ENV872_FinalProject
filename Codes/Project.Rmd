@@ -136,13 +136,14 @@ ThirdForkCreekDischarge_Monthly <- ThirdForkCreekDischarge %>%
 
 ```{r Groundwater}
 GroundParams <- whatNWISdata(siteNumbers = "355944079013401")
-DurhamGroundwater <- readNWISdv(siteNumbers = "355852078572045",
-                                 parameterCd = "62610", # /72019/Groundwater level above NGVD 1929 (feet)
-                                 startDate = "2009-01-01",
+DurhamGroundwater <- readNWISdv(siteNumbers = "355944079013401",
+                                 parameterCd = "72019", # /62610/Groundwater level above NGVD 1929 (feet)
+                                 statCd = "00002",
+                                 startDate = "2014-01-01",
                                  endDate = "2021-12-31")
-names(DurhamGroundwater)[4:5] <- c("Groundwater", "Approval.Code")
+names(DurhamGroundwater)[4:5] <- c("Groundwater_Table_feet", "Approval.Code")
 c(min(DurhamGroundwater$Date), max(DurhamGroundwater$Date))
-#
+# 
 ```
 
 ```{r Total Withdrawl}
@@ -287,17 +288,17 @@ industry_withdrawal_Monthly <- industry_withdrawal %>%
   mutate(Month = format(Date,"%Y-%m")) %>%
   group_by(Month) %>%
   summarise(Avg_Industrial_Withdrawals_mgd = sum(Avg_Withdrawals_mgd))
-
 ```
 
 ```{r Precipitation}
 #Precipitation
 PreciParams <- whatNWISdata(siteNumbers = "355852078572045")
 DurhamPrecipitaion <- readNWISdv(siteNumbers = "355852078572045",
-                                 parameterCd = "00065", # precipitation (inches)
+                                 parameterCd = "00045", # precipitation (inches)
+                                 statCd = "00006",
                                  startDate = "2009-01-01",
                                  endDate = "2021-12-31")
-names(DurhamPrecipitaion)[4:5] <- c("Precipitaion", "Approval.Code")
+names(DurhamPrecipitaion)[4:5] <- c("Precipitaion_inches", "Approval.Code")
 c(min(DurhamPrecipitaion$Date), max(DurhamPrecipitaion$Date))
 #
 ```
@@ -415,8 +416,29 @@ total_withdrawal_trend <- smk.test(total_withdrawal_timeseries)
 total_withdrawal_trend
 summary(total_withdrawal_trend)
 #p-value is 0.3775, so there is no trend present in Total Withdrawals.
+```
 
+```{r time-series analysis on groundwater}
+DurhamGroundwater_timeseries <- ts(DurhamGroundwater$Groundwater_Table_feet, frequency = 12,
+                           start = c(2009, 1, 1), end = c(2021, 12, 1))
+DurhamGroundwater_Decomposed <- stl(DurhamGroundwater_timeseries, s.window = "periodic")
+plot(DurhamGroundwater_Decomposed)
 
+DurhamGroundwater_trend <- smk.test(DurhamGroundwater_timeseries)
+DurhamGroundwater_trend
+summary(DurhamGroundwater_trend)
+#p-value is less than 0.05, so there is no trend present in Total Withdrawals.
+```
+
+```{r time-series analysis on precipitation}
+DurhamPrecipitaion_timeseries <- ts(DurhamPrecipitaion$Precipitaion_inches, frequency = 12,
+                           start = c(2009, 1, 1), end = c(2021, 12, 1))
+DurhamPrecipitaion_Decomposed <- stl(DurhamPrecipitaion_timeseries, s.window = "periodic")
+plot(DurhamPrecipitaion_Decomposed)
+
+DurhamPrecipitaion_trend <- smk.test(DurhamGroundwater_timeseries)
+DurhamPrecipitaion_trend
+summary(DurhamPrecipitaion_trend)
 ```
 
 # Rationale and Research Questions

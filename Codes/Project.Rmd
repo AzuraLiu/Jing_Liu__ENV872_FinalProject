@@ -522,6 +522,9 @@ mod2.1 <- lm(Groundwater_Table_feet ~ CapeFear_Discharge + Flat_Discharge + Litt
 summary(mod2.1)
 mod2.2 <- update(mod2.1, .~. -CapeFear_Discharge)
 summary(mod2.2)
+
+par(mfrow=c(2,2))
+plot(mod2.2)
 ```
 
 ```{r groundwater and withdraws}
@@ -532,6 +535,9 @@ data3 <- left_join(DurhamGroundwater_Monthly, totalwit)
 
 mod3 <- lm(Mean_Groundwater_Table_feet ~ Mean_Avg_Daily_Use_mgd, data = data3)
 summary(mod3)
+
+par(mfrow=c(2,2))
+plot(mod3)
 ```
 
 ```{r groundwater, withdraws, precipitation and river discharge}

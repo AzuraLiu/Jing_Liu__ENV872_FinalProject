@@ -170,15 +170,18 @@ DurhamGroundwater <- readNWISdv(siteNumbers = "355944079013401", #Duke Forest
                                  statCd = "00002",
                                  startDate = "2014-01-01",
                                  endDate = "2021-12-31")
-names(DurhamGroundwater)[4:5] <- c("Groundwater_Table_feet", "Approval.Code")
-c(min(DurhamGroundwater$Date), max(DurhamGroundwater$Date))
-# 
+colnames(DurhamGroundwater) <- c("Agency_Name",
+                                 "Site_Number",
+                                 "Date",
+                                 "Groundwater_Table_feet", 
+                                 "Approval.Code")
+summary(DurhamGroundwater)
+head(DurhamGroundwater)
 
 DurhamGroundwater_Monthly <- DurhamGroundwater %>%
   mutate(Month = format(Date,"%Y-%m")) %>%
   group_by(Month) %>%
   summarise(Mean_Groundwater_Table_feet = mean(Groundwater_Table_feet))
-
 ```
 
 ```{r Total Withdrawl}
@@ -342,9 +345,13 @@ DurhamPrecipitaion <- readNWISdv(siteNumbers = "355852078572045",
                                  statCd = "00006",
                                  startDate = "2009-01-01",
                                  endDate = "2021-12-31")
-names(DurhamPrecipitaion)[4:5] <- c("Precipitaion_inches", "Approval.Code")
-
-c(min(DurhamPrecipitaion$Date), max(DurhamPrecipitaion$Date))
+colnames(DurhamPrecipitaion) <- c("Agency_Name",
+                                 "Site_Number",
+                                 "Date",
+                                 "Precipitaion_inches", 
+                                 "Approval.Code")
+summary(DurhamPrecipitaion)
+head(DurhamPrecipitaion)
 ```
 
 ```{r Total Wastewater}

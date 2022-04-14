@@ -77,7 +77,7 @@ c(min(CapeFearRiverDischarge$Date), max(CapeFearRiverDischarge$Date))
 CapeFearRiverDischarge_Monthly <- CapeFearRiverDischarge %>%
   mutate(Month = format(Date,"%Y-%m")) %>%
   group_by(Month) %>%
-  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+  summarise(Mean_Discharge_Bymonth = mean(CapeFear_Discharge),
             River = paste("Cape Fear River"))
 
 FlatRiverDischarge <- readNWISdv(siteNumbers = "02085500",
@@ -172,6 +172,12 @@ DurhamGroundwater <- readNWISdv(siteNumbers = "355944079013401", #Duke Forest
 names(DurhamGroundwater)[4:5] <- c("Groundwater_Table_feet", "Approval.Code")
 c(min(DurhamGroundwater$Date), max(DurhamGroundwater$Date))
 # 
+
+DurhamGroundwater_Monthly <- DurhamGroundwater %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Mean_Groundwater_Table_feet = mean(Groundwater_Table_feet))
+
 ```
 
 ```{r Total Withdrawl}
@@ -206,6 +212,15 @@ scrape.totalwithdrawal <- function(the_pswid, the_year){
 
 total_withdrawal <- map(the_years, scrape.totalwithdrawal, the_pswid = durham_pswid)
 total_withdrawal <- bind_rows(total_withdrawal)
+
+total_withdrawal <- read.csv("~/Jing_Liu__ENV872_FinalProject/Data/Processed/Durham_Withdrawal_Processed.csv")
+total_withdrawal$Date <- as_date(total_withdrawal$Date, format = "%m/%d/%y")
+
+total_withdrawal_Monthly <- total_withdrawal %>%
+  select(Date, Avg_Daily_Use_mgd) %>%
+  mutate(Month = format(Date,"%Y-%m")) %>%
+  group_by(Month) %>%
+  summarise(Mean_Avg_Daily_Use_mgd = mean(Avg_Daily_Use_mgd))
 ```
 
 ```{r Withdrawal Distribution}
@@ -507,8 +522,14 @@ mod2.2 <- update(mod2.1, .~. -CapeFear_Discharge)
 summary(mod2.2)
 ```
 
-```{r}
+```{r groundwater and withdraws}
+totalwit <- total_withdrawal_Monthly %>%
+  select(Month, Mean_Avg_Daily_Use_mgd) %>%
+  filter(Month > "2013-12")
+data3 <- left_join(DurhamGroundwater_Monthly, totalwit) 
 
+mod3 <- lm(Mean_Groundwater_Table_feet ~ Mean_Avg_Daily_Use_mgd, data = data3)
+summary(mod3)
 ```
 
 ## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed> Is there a relationship between surface water flow and groundwater levels in Durham region?

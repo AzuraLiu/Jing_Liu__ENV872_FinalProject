@@ -532,6 +532,10 @@ mod3 <- lm(Mean_Groundwater_Table_feet ~ Mean_Avg_Daily_Use_mgd, data = data3)
 summary(mod3)
 ```
 
+```{r groundwater, withdraws, precipitation and river discharge}
+
+```
+
 ## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed> Is there a relationship between surface water flow and groundwater levels in Durham region?
 
 ## Question 2: How much is surface water affected by municipal withdrawal and precipitation recharge?

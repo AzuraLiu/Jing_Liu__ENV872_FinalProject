@@ -61,6 +61,7 @@ library(dataRetrieval)
 library(rvest)
 library(lme4)
 library(lmerTest)
+library(ggplot2)
 # Set your ggplot theme
 theme_set(theme_classic())
 ```
@@ -525,6 +526,22 @@ summary(mod2.2)
 
 par(mfrow=c(2,2))
 plot(mod2.2)
+
+ggplotRegression <- function (fit) {
+require(ggplot2)
+ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") +
+  labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                     "Intercept =",signif(fit$coef[[1]],5 ),
+                     " Slope =",signif(fit$coef[[2]], 5),
+                     " P =",signif(summary(fit)$coef[2,4], 5)))
+}
+
+plot(Groundwater_Table_feet ~ Flat_Discharge + Little_Discharge, data = data2)
+abline(fit1)
+ggplotRegression(lm(Groundwater_Table_feet ~ Flat_Discharge + Little_Discharge, data = data2))
+
 ```
 
 ```{r groundwater and withdraws}

@@ -90,7 +90,7 @@ c(min(FlatRiverDischarge$Date), max(FlatRiverDischarge$Date))
 FlatRiverDischarge_Monthly <- FlatRiverDischarge %>%
   mutate(Month = format(Date,"%Y-%m")) %>%
   group_by(Month) %>%
-  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+  summarise(Mean_Discharge_Bymonth = mean(Flat_Discharge),
             River = paste("Flat River"))
 
 LittleRiverDischarge <- readNWISdv(siteNumbers = "0208524975",
@@ -103,7 +103,7 @@ c(min(LittleRiverDischarge$Date), max(LittleRiverDischarge$Date))
 LittleRiverDischarge_Monthly <- LittleRiverDischarge %>%
   mutate(Month = format(Date,"%Y-%m")) %>%
   group_by(Month) %>%
-  summarise(Mean_Discharge_Bymonth = mean(Discharge),
+  summarise(Mean_Discharge_Bymonth = mean(Little_Discharge),
             River = paste("Little River"))
 
 #Emergency Water Resources
@@ -213,7 +213,7 @@ scrape.totalwithdrawal <- function(the_pswid, the_year){
 total_withdrawal <- map(the_years, scrape.totalwithdrawal, the_pswid = durham_pswid)
 total_withdrawal <- bind_rows(total_withdrawal)
 
-total_withdrawal <- read.csv("~/Jing_Liu__ENV872_FinalProject/Data/Processed/Durham_Withdrawal_Processed.csv")
+total_withdrawal <- read.csv("../Data/Processed/Durham_Withdrawal_Processed.csv")
 total_withdrawal$Date <- as_date(total_withdrawal$Date, format = "%m/%d/%y")
 
 total_withdrawal_Monthly <- total_withdrawal %>%
@@ -500,6 +500,8 @@ data1 <- left_join(groudw, precip)
 
 mod1 <- lm(Groundwater_Table_feet ~ Precipitaion_inches, data = data1)
 summary(mod1)
+par(mfrow=c(2,2))
+plot(mod1)
 ```
 
 ```{r groundwater and river discharge}

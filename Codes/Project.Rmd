@@ -527,20 +527,11 @@ summary(mod2.2)
 par(mfrow=c(2,2))
 plot(mod2.2)
 
-ggplotRegression <- function (fit) {
-require(ggplot2)
-ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
-  geom_point() +
-  stat_smooth(method = "lm", col = "red") +
-  labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
-                     "Intercept =",signif(fit$coef[[1]],5 ),
-                     " Slope =",signif(fit$coef[[2]], 5),
-                     " P =",signif(summary(fit)$coef[2,4], 5)))
-}
-
-plot(Groundwater_Table_feet ~ Flat_Discharge + Little_Discharge, data = data2)
-abline(fit1)
-ggplotRegression(lm(Groundwater_Table_feet ~ Flat_Discharge + Little_Discharge, data = data2))
+ggplot(data2, aes(Groundwater_Table_feet))+
+  theme(text = element_text(size = 20))+
+  geom_point(aes(y=Flat_Discharge, color = "Flat River"))+
+    geom_point(aes(y=Little_Discharge, color = "Little River"))+
+  xlab("Groundwater table/ft")+ylab("River Discharge (sqft/s)")
 
 ```
 
@@ -555,6 +546,13 @@ summary(mod3)
 
 par(mfrow=c(2,2))
 plot(mod3)
+
+ggplot(data3,aes(x=Mean_Groundwater_Table_feet,y=Mean_Avg_Daily_Use_mgd))+
+       geom_point()+
+  theme(text = element_text(size = 19))+
+  geom_smooth(method = lm) +
+  xlab("Average Daily Water Use (million gallon/day)")+ylab("Groundwater table (ft)")
+
 ```
 
 ```{r groundwater, withdraws, precipitation and river discharge}

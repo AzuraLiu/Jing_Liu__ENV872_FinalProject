@@ -456,7 +456,7 @@ summary(LittleRiver_trend)
 ```{r time-series analysis on withdrawals}
 #Total Withdrawals
 total_withdrawal_timeseries <- ts(total_withdrawal$Avg_Daily_Use_mgd, frequency = 12,
-                           start = c(2018, 1, 1), end = c(2021, 12, 1))
+                           start = c(2006, 1, 1), end = c(2021, 12, 1))
 total_withdrawal_Decomposed <- stl(total_withdrawal_timeseries, s.window = "periodic")
 plot(total_withdrawal_Decomposed)
 

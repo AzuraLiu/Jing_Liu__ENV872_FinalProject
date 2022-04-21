@@ -5,9 +5,9 @@ output:
     fig_caption: yes
     number_sections: yes
 geometry: margin=2.54cm
-title: "Insert title of project here"
-subtitle: "Web address for GitHub repository"
-author: "Name"
+title: "Analysis of Water Supplies and Withdraws’ Effects on Water Resources Capacity in Durham, North Carolina"
+subtitle: "https://github.com/AzuraLiu/Jing_Liu__ENV872_FinalProject.git"
+author: "Yikai Jing & Azura Liu"
 fontsize: 12pt
 mainfont: Times New Roman
 
@@ -15,20 +15,13 @@ mainfont: Times New Roman
 
 \newpage
 \tableofcontents 
-Rationale and Research Questions
-Dataset Information
-Exploratory Analysis
-Analysis
-Summary and Conclusions
-References
 
 
 \newpage
 \listoftables 
 
+N/A
 
-
-\newpage
 \listoffigures 
 
 
@@ -183,7 +176,8 @@ ThirdForkCreekDischarge_Monthly <- ThirdForkCreekDischarge %>%
 ```{r Groundwater}
 GroundParams <- whatNWISdata(siteNumbers = "355944079013401")
 DurhamGroundwater <- readNWISdv(siteNumbers = "355944079013401", #Duke Forest
-                                 parameterCd = "72019", # /62610/Groundwater level above NGVD 1929 (feet)
+                                 parameterCd = "72019", 
+                                # /62610/Groundwater level above NGVD 1929 (feet)
                                  statCd = "00002",
                                  startDate = "2014-01-01",
                                  endDate = "2021-12-31")
@@ -209,23 +203,20 @@ the_years = c(2018:2021)
 
 #Scrap Function
 scrape.totalwithdrawal <- function(the_pswid, the_year){
-  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', 
-                                  the_pswid, '&year=', the_year))
-  
-  water_system_name_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
-  ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
-  avg_daily_use_tag <- '.fancy-table:nth-child(31) th+ td'
-  
-  water_system_name <- the_website %>% html_nodes(water_system_name_tag) %>% html_text()
-  ownership <- the_website %>%   html_nodes(ownership_tag) %>%  html_text()
-  avg_daily_use <- the_website %>% html_nodes(avg_daily_use_tag) %>% html_text()
-  
-  df_withdrawals <- data.frame("Year" = rep(the_year,12),
-                               "Month" = rep(1:12),
-                               "Avg_Daily_Use_mgd" = as.numeric(avg_daily_use)) %>% 
-    mutate(Water_System_name = !!water_system_name,
-         Ownership = !!ownership,
-         Date = my(paste(Month,"-",Year)))
+the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=',
+the_pswid, '&year=', the_year))
+water_system_name_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
+ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
+avg_daily_use_tag <- '.fancy-table:nth-child(31) th+ td'
+water_system_name <- the_website %>% html_nodes(water_system_name_tag) %>% html_text()
+ownership <- the_website %>% html_nodes(ownership_tag) %>% html_text()
+avg_daily_use <- the_website %>% html_nodes(avg_daily_use_tag) %>% html_text()
+df_withdrawals <- data.frame("Year" = rep(the_year,12),
+"Month" = rep(1:12),
+"Avg_Daily_Use_mgd" = as.numeric(avg_daily_use)) %>%
+mutate(Water_System_name = !!water_system_name,
+Ownership = !!ownership,
+Date = my(paste(Month,"-",Year)))
   
   print(paste('The Pswid =', the_pswid, ', The Year =', the_year))
   return(df_withdrawals)
@@ -249,7 +240,6 @@ total_withdrawal_Monthly <- total_withdrawal %>%
 durham_pswid = '03-32-010'
 #years with records
 the_years = c(2018:2021)
-
 scrape.withdrawal.distribution <- function(the_pswid, the_year){
   the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', 
                                   the_pswid, '&year=', the_year))
@@ -276,7 +266,6 @@ scrape.withdrawal.distribution <- function(the_pswid, the_year){
   print(paste('The Pswid =', the_pswid, ', The Year =', the_year))
   return(df_withdrawals)
 }
-
 withdrawal_distribution <- map(the_years, scrape.withdrawal.distribution, the_pswid = durham_pswid)
 withdrawal_distribution <- bind_rows(withdrawal_distribution)
 ```
@@ -286,7 +275,8 @@ withdrawal_distribution <- bind_rows(withdrawal_distribution)
 #Precipitation
 PreciParams <- whatNWISdata(siteNumbers = "355852078572045")
 DurhamPrecipitaion <- readNWISdv(siteNumbers = "355852078572045",
-                                 parameterCd = "00045", # precipitation (inches)
+                                 parameterCd = "00045", 
+                                 # precipitation (inches)
                                  statCd = "00006",
                                  startDate = "2009-01-01",
                                  endDate = "2021-12-31")
@@ -305,8 +295,9 @@ head(DurhamPrecipitaion)
 
 # Analysis
 
-```{r time-series analysis on Regular Water Resources}
-CapeFearRiver_timeseries <- ts(CapeFearRiverDischarge_Monthly$Mean_CapeFear_Discharge_Bymonth, frequency = 12,start = c(1990, 1, 1), end = c(2021, 12, 1))
+```{r Cap Fear Time serries, fig.cap = "Cap Fear Time Seiries"}
+CapeFearRiver_timeseries <- ts(CapeFearRiverDischarge_Monthly$Mean_CapeFear_Discharge_Bymonth, 
+                        frequency = 12,start = c(1990, 1, 1), end = c(2021, 12, 1))
 CapeFearRiver_Decomposed <- stl(CapeFearRiver_timeseries, s.window = "periodic")
 plot(CapeFearRiver_Decomposed)
 
@@ -315,17 +306,23 @@ CapeFearRiver_trend
 summary(CapeFearRiver_trend)
 #p-value is 0.3233, so there is no trend present in Cape Fear River.
 
-FlatRiver_timeseries <- ts(FlatRiverDischarge_Monthly$Mean_Flat_Discharge_Bymonth, frequency = 12,
+FlatRiver_timeseries <- ts(FlatRiverDischarge_Monthly$Mean_Flat_Discharge_Bymonth, 
+                           frequency = 12,
                            start = c(1990, 1, 1), end = c(2021, 12, 1))
 FlatRiver_Decomposed <- stl(FlatRiver_timeseries, s.window = "periodic")
 plot(FlatRiver_Decomposed)
+```
 
+```{r Flat River Time Series, fig.cap = "Flat River Time Series"}
 FlatRiver_trend <- smk.test(FlatRiver_timeseries)
 FlatRiver_trend
 summary(FlatRiver_trend)
 #p-value is 0.3968, so there is no trend present in Flat River.
-
-LittleRiver_timeseries <- ts(LittleRiverDischarge_Monthly$Mean_Little_Discharge_Bymonth, frequency = 12,
+```
+```{r Little River Time Series, fig.cap = "Little River Time Series"}
+LittleRiver_timeseries <- 
+      ts(LittleRiverDischarge_Monthly$Mean_Little_Discharge_Bymonth, 
+      frequency = 12,
                            start = c(1990, 1, 1), end = c(2021, 12, 1))
 LittleRiver_Decomposed <- stl(LittleRiver_timeseries, s.window = "periodic")
 plot(LittleRiver_Decomposed)
@@ -334,10 +331,16 @@ LittleRiver_trend <- smk.test(LittleRiver_timeseries)
 LittleRiver_trend
 summary(LittleRiver_trend)
 #p-value is 0.4073, so there is no trend present in Little River.
-#The time-series analysis on Cape Fear Lake, Flat River and Little River do not show any obvious trend in long term. However, we can tell a great similarity between the trend patterns of Cape Fear Lake and Flat River. This raises our concern because they do not come from the same basin. Instead, Little River, which comes from the same watershed as Flat River, shows a more different pattern.
+#The time-series analysis on Cape Fear Lake, Flat River and Little River 
+#do not show any obvious trend in long term. 
+#However, we can tell a great similarity between the trend patterns of
+#Cape Fear Lake and Flat River. This raises our concern because 
+#they do not come from the same basin. Instead, Little River, 
+#which comes from the same watershed as Flat River, 
+#shows a more different pattern.
 ```
 
-```{r time-series analysis on withdrawals}
+```{r time-series analysis on withdrawals, fig.cap = "Total Withdraw Time Series"}
 #Total Withdrawals
 total_withdrawal_timeseries <- ts(total_withdrawal$Avg_Daily_Use_mgd, frequency = 12,
                            start = c(2006, 1, 1), end = c(2021, 12, 1))
@@ -348,10 +351,12 @@ total_withdrawal_trend <- smk.test(total_withdrawal_timeseries)
 total_withdrawal_trend
 summary(total_withdrawal_trend)
 #p-value is 0.3775, so there is no trend present in Total Withdrawals.
-#The time-series analysis on municipal withdrawals in Durham shows an obvious increase since 2010. However, the drop in 2019 and 2021 needs more data and reports to explain. 
+#The time-series analysis on municipal withdrawals in Durham shows 
+#an obvious increase since 2010. However, the drop in 2019 and 2021 
+#needs more data and reports to explain. 
 ```
 
-```{r time-series analysis on groundwater}
+```{r time-series analysis on groundwater, fig.cap = "Groundwater Time Series"}
 DurhamGroundwater_timeseries <- ts(DurhamGroundwater$Groundwater_Table_feet, frequency = 12,
                            start = c(2009, 1, 1), end = c(2021, 12, 1))
 DurhamGroundwater_Decomposed <- stl(DurhamGroundwater_timeseries, s.window = "periodic")
@@ -361,10 +366,11 @@ DurhamGroundwater_trend <- smk.test(DurhamGroundwater_timeseries)
 DurhamGroundwater_trend
 summary(DurhamGroundwater_trend)
 #p-value is less than 0.05, so there is no trend present in Total Withdrawals.
-#The time-series analysis on groundwater table level in Durham shows a significant decrease since 2010. 
+#The time-series analysis on groundwater table level in Durham shows a 
+#significant decrease since 2010. 
 ```
 
-```{r time-series analysis on precipitation}
+```{r time-series analysis on precipitation, fig.cap = "Precipitation Time Series"}
 DurhamPrecipitaion_timeseries <- ts(DurhamPrecipitaion$Precipitaion_inches, frequency = 12,
                            start = c(2009, 1, 1), end = c(2021, 12, 1))
 DurhamPrecipitaion_Decomposed <- stl(DurhamPrecipitaion_timeseries, s.window = "periodic")
@@ -373,10 +379,11 @@ plot(DurhamPrecipitaion_Decomposed)
 DurhamPrecipitaion_trend <- smk.test(DurhamGroundwater_timeseries)
 DurhamPrecipitaion_trend
 summary(DurhamPrecipitaion_trend)
-#The time-series analysis on precipitation in Durham shows a gradual rise since 2010 and a dynamic increase in recent years. 
+#The time-series analysis on precipitation in Durham shows a gradual rise 
+#since 2010 and a dynamic increase in recent years. 
 ```
 
-```{r river discharge and precipitation}
+```{r river discharge and precipitation, fig.cap = "Model 1 Diagnostic Graphs"}
 precip <- DurhamPrecipitaion %>%
   select(Date, Precipitaion_inches) %>%
   filter(Date > "2013-12-31")
@@ -393,13 +400,14 @@ data1 <- left_join(precip, capefear) %>%
   left_join(., flat) %>%
   left_join(., little) 
 
-mod1 <- lm(Precipitaion_inches ~ CapeFear_Discharge + Flat_Discharge + Little_Discharge, data = data1)
+mod1 <- lm(Precipitaion_inches ~ CapeFear_Discharge + Flat_Discharge + 
+             Little_Discharge, data = data1)
 summary(mod1)
 par(mfrow=c(2,2))
 plot(mod1)
 ```
 
-```{r river discharge and withdraws}
+```{r river discharge and withdraws,, fig.cap = "Model 2.1 Diagnostic Graphs"}
 totalwit <- total_withdrawal_Monthly %>%
   select(Month, Mean_Avg_Daily_Use_mgd) %>%
   filter(Month > "2013-12") 
@@ -419,7 +427,8 @@ data2 <- left_join(totalwit, capefearmonthly) %>%
   left_join(., flatmonthly) %>%
   left_join(., littlemonthly) 
 
-mod2.1 <- lm(Mean_Avg_Daily_Use_mgd ~ CapeFear_Discharge + Flat_Discharge + Little_Discharge, data = data2)
+mod2.1 <- lm(Mean_Avg_Daily_Use_mgd ~ CapeFear_Discharge + Flat_Discharge + 
+               Little_Discharge, data = data2)
 summary(mod2.1)
 mod2.2 <- update(mod2.1, .~. -CapeFear_Discharge)
 summary(mod2.2)
@@ -430,7 +439,7 @@ par(mfrow=c(2,2))
 plot(mod2.1)
 ```
 
-```{r groundwater and precipitation}
+```{r groundwater and precipitation, fig.cap = "Model 3 Diagnostic Graphs"}
 precip <- DurhamPrecipitaion %>%
   select(Date, Precipitaion_inches) %>%
   filter(Date > "2013-12-31")
@@ -447,7 +456,7 @@ plot(mod3)
 
 
 
-```{r groundwater and withdraws}
+```{r groundwater and withdraws, fig.cap = "Model 4 Diagnostic Graphs"}
 totalwit <- total_withdrawal_Monthly %>%
   select(Month, Mean_Avg_Daily_Use_mgd) %>%
   filter(Month > "2013-12")
@@ -455,10 +464,11 @@ data4 <- left_join(DurhamGroundwater_Monthly, totalwit)
 
 mod4 <- lm(Mean_Groundwater_Table_feet ~ Mean_Avg_Daily_Use_mgd, data = data4)
 summary(mod4)
-
 par(mfrow=c(2,2))
 plot(mod4)
+```
 
+```{r m4,  fig.cap = "Average Daily Water Use vs. Groundwater Table"}
 ggplot(data4,aes(x=Mean_Groundwater_Table_feet,y=Mean_Avg_Daily_Use_mgd))+
        geom_point()+
   theme(text = element_text(size = 19))+
@@ -467,7 +477,7 @@ ggplot(data4,aes(x=Mean_Groundwater_Table_feet,y=Mean_Avg_Daily_Use_mgd))+
 
 ```
 
-```{r groundwater and river discharge}
+```{r groundwater and river discharge, fig.cap = "Model 5.2 Diagnostic Graphs"}
 capefear <- CapeFearRiverDischarge %>%
   select(Date, CapeFear_Discharge) %>%
   filter(Date > "2013-12-31")
@@ -481,14 +491,17 @@ data5 <- left_join(groudw, capefear) %>%
   left_join(., flat) %>%
   left_join(., little) 
 
-mod5.1 <- lm(Groundwater_Table_feet ~ CapeFear_Discharge + Flat_Discharge + Little_Discharge, data = data5)
+mod5.1 <- lm(Groundwater_Table_feet ~ CapeFear_Discharge + Flat_Discharge + 
+               Little_Discharge, data = data5)
 summary(mod5.1)
 mod5.2 <- update(mod5.1, .~. -CapeFear_Discharge)
 summary(mod5.2)
 
 par(mfrow=c(2,2))
 plot(mod5.2)
+```
 
+```{r m5.2, fig.cap = "Groundwater table vs. River Discharge"}
 ggplot(data5, aes(Groundwater_Table_feet))+
   theme(text = element_text(size = 20))+
   geom_point(aes(y=Flat_Discharge, color = "Flat River"))+

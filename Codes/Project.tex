@@ -5,17 +5,6 @@
 \documentclass[
   12pt,
 ]{article}
-\title{Insert title of project here}
-\usepackage{etoolbox}
-\makeatletter
-\providecommand{\subtitle}[1]{% add subtitle to \maketitle
-  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
-}
-\makeatother
-\subtitle{Web address for GitHub repository}
-\author{Name}
-\date{}
-
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
 \usepackage{iftex}
@@ -49,8 +38,8 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={Insert title of project here},
-  pdfauthor={Name},
+  pdftitle={Analysis of Water Supplies and Withdraws' Effects on Water Resources Capacity in Durham, North Carolina},
+  pdfauthor={Yikai Jing \& Azura Liu},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
@@ -116,19 +105,29 @@
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 
+\title{Analysis of Water Supplies and Withdraws' Effects on Water
+Resources Capacity in Durham, North Carolina}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{\url{https://github.com/AzuraLiu/Jing_Liu__ENV872_FinalProject.git}}
+\author{Yikai Jing \& Azura Liu}
+\date{}
+
 \begin{document}
 \maketitle
 
 \newpage
 \tableofcontents
 
-Rationale and Research Questions Dataset Information Exploratory
-Analysis Analysis Summary and Conclusions References
-
 \newpage
 \listoftables
 
-\newpage
+N/A
+
 \listoffigures
 
 \newpage
@@ -406,7 +405,8 @@ without considering the volume of treated wastewater in Durham region.
 \begin{Highlighting}[]
 \NormalTok{GroundParams }\OtherTok{\textless{}{-}} \FunctionTok{whatNWISdata}\NormalTok{(}\AttributeTok{siteNumbers =} \StringTok{"355944079013401"}\NormalTok{)}
 \NormalTok{DurhamGroundwater }\OtherTok{\textless{}{-}} \FunctionTok{readNWISdv}\NormalTok{(}\AttributeTok{siteNumbers =} \StringTok{"355944079013401"}\NormalTok{, }\CommentTok{\#Duke Forest}
-                                 \AttributeTok{parameterCd =} \StringTok{"72019"}\NormalTok{, }\CommentTok{\# /62610/Groundwater level above NGVD 1929 (feet)}
+                                 \AttributeTok{parameterCd =} \StringTok{"72019"}\NormalTok{, }
+                                \CommentTok{\# /62610/Groundwater level above NGVD 1929 (feet)}
                                  \AttributeTok{statCd =} \StringTok{"00002"}\NormalTok{,}
                                  \AttributeTok{startDate =} \StringTok{"2014{-}01{-}01"}\NormalTok{,}
                                  \AttributeTok{endDate =} \StringTok{"2021{-}12{-}31"}\NormalTok{)}
@@ -470,23 +470,20 @@ without considering the volume of treated wastewater in Durham region.
 
 \CommentTok{\#Scrap Function}
 \NormalTok{scrape.totalwithdrawal }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(the\_pswid, the\_year)\{}
-\NormalTok{  the\_website }\OtherTok{\textless{}{-}} \FunctionTok{read\_html}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{\textquotesingle{}https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=\textquotesingle{}}\NormalTok{, }
-\NormalTok{                                  the\_pswid, }\StringTok{\textquotesingle{}\&year=\textquotesingle{}}\NormalTok{, the\_year))}
-  
-\NormalTok{  water\_system\_name\_tag }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}div+ table tr:nth{-}child(1) td:nth{-}child(2)\textquotesingle{}}
-\NormalTok{  ownership\_tag }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}div+ table tr:nth{-}child(2) td:nth{-}child(4)\textquotesingle{}}
-\NormalTok{  avg\_daily\_use\_tag }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}.fancy{-}table:nth{-}child(31) th+ td\textquotesingle{}}
-  
-\NormalTok{  water\_system\_name }\OtherTok{\textless{}{-}}\NormalTok{ the\_website }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_nodes}\NormalTok{(water\_system\_name\_tag) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_text}\NormalTok{()}
-\NormalTok{  ownership }\OtherTok{\textless{}{-}}\NormalTok{ the\_website }\SpecialCharTok{\%\textgreater{}\%}   \FunctionTok{html\_nodes}\NormalTok{(ownership\_tag) }\SpecialCharTok{\%\textgreater{}\%}  \FunctionTok{html\_text}\NormalTok{()}
-\NormalTok{  avg\_daily\_use }\OtherTok{\textless{}{-}}\NormalTok{ the\_website }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_nodes}\NormalTok{(avg\_daily\_use\_tag) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_text}\NormalTok{()}
-  
-\NormalTok{  df\_withdrawals }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\StringTok{"Year"} \OtherTok{=} \FunctionTok{rep}\NormalTok{(the\_year,}\DecValTok{12}\NormalTok{),}
-                               \StringTok{"Month"} \OtherTok{=} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{12}\NormalTok{),}
-                               \StringTok{"Avg\_Daily\_Use\_mgd"} \OtherTok{=} \FunctionTok{as.numeric}\NormalTok{(avg\_daily\_use)) }\SpecialCharTok{\%\textgreater{}\%} 
-    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Water\_System\_name =} \SpecialCharTok{!!}\NormalTok{water\_system\_name,}
-         \AttributeTok{Ownership =} \SpecialCharTok{!!}\NormalTok{ownership,}
-         \AttributeTok{Date =} \FunctionTok{my}\NormalTok{(}\FunctionTok{paste}\NormalTok{(Month,}\StringTok{"{-}"}\NormalTok{,Year)))}
+\NormalTok{the\_website }\OtherTok{\textless{}{-}} \FunctionTok{read\_html}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{\textquotesingle{}https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=\textquotesingle{}}\NormalTok{,}
+\NormalTok{the\_pswid, }\StringTok{\textquotesingle{}\&year=\textquotesingle{}}\NormalTok{, the\_year))}
+\NormalTok{water\_system\_name\_tag }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}div+ table tr:nth{-}child(1) td:nth{-}child(2)\textquotesingle{}}
+\NormalTok{ownership\_tag }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}div+ table tr:nth{-}child(2) td:nth{-}child(4)\textquotesingle{}}
+\NormalTok{avg\_daily\_use\_tag }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}.fancy{-}table:nth{-}child(31) th+ td\textquotesingle{}}
+\NormalTok{water\_system\_name }\OtherTok{\textless{}{-}}\NormalTok{ the\_website }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_nodes}\NormalTok{(water\_system\_name\_tag) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_text}\NormalTok{()}
+\NormalTok{ownership }\OtherTok{\textless{}{-}}\NormalTok{ the\_website }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_nodes}\NormalTok{(ownership\_tag) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_text}\NormalTok{()}
+\NormalTok{avg\_daily\_use }\OtherTok{\textless{}{-}}\NormalTok{ the\_website }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_nodes}\NormalTok{(avg\_daily\_use\_tag) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{html\_text}\NormalTok{()}
+\NormalTok{df\_withdrawals }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\StringTok{"Year"} \OtherTok{=} \FunctionTok{rep}\NormalTok{(the\_year,}\DecValTok{12}\NormalTok{),}
+\StringTok{"Month"} \OtherTok{=} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{12}\NormalTok{),}
+\StringTok{"Avg\_Daily\_Use\_mgd"} \OtherTok{=} \FunctionTok{as.numeric}\NormalTok{(avg\_daily\_use)) }\SpecialCharTok{\%\textgreater{}\%}
+\FunctionTok{mutate}\NormalTok{(}\AttributeTok{Water\_System\_name =} \SpecialCharTok{!!}\NormalTok{water\_system\_name,}
+\AttributeTok{Ownership =} \SpecialCharTok{!!}\NormalTok{ownership,}
+\AttributeTok{Date =} \FunctionTok{my}\NormalTok{(}\FunctionTok{paste}\NormalTok{(Month,}\StringTok{"{-}"}\NormalTok{,Year)))}
   
   \FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{\textquotesingle{}The Pswid =\textquotesingle{}}\NormalTok{, the\_pswid, }\StringTok{\textquotesingle{}, The Year =\textquotesingle{}}\NormalTok{, the\_year))}
   \FunctionTok{return}\NormalTok{(df\_withdrawals)}
@@ -524,7 +521,6 @@ without considering the volume of treated wastewater in Durham region.
 \NormalTok{durham\_pswid }\OtherTok{=} \StringTok{\textquotesingle{}03{-}32{-}010\textquotesingle{}}
 \CommentTok{\#years with records}
 \NormalTok{the\_years }\OtherTok{=} \FunctionTok{c}\NormalTok{(}\DecValTok{2018}\SpecialCharTok{:}\DecValTok{2021}\NormalTok{)}
-
 \NormalTok{scrape.withdrawal.distribution }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(the\_pswid, the\_year)\{}
 \NormalTok{  the\_website }\OtherTok{\textless{}{-}} \FunctionTok{read\_html}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{\textquotesingle{}https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=\textquotesingle{}}\NormalTok{, }
 \NormalTok{                                  the\_pswid, }\StringTok{\textquotesingle{}\&year=\textquotesingle{}}\NormalTok{, the\_year))}
@@ -551,7 +547,6 @@ without considering the volume of treated wastewater in Durham region.
   \FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{\textquotesingle{}The Pswid =\textquotesingle{}}\NormalTok{, the\_pswid, }\StringTok{\textquotesingle{}, The Year =\textquotesingle{}}\NormalTok{, the\_year))}
   \FunctionTok{return}\NormalTok{(df\_withdrawals)}
 \NormalTok{\}}
-
 \NormalTok{withdrawal\_distribution }\OtherTok{\textless{}{-}} \FunctionTok{map}\NormalTok{(the\_years, scrape.withdrawal.distribution, }\AttributeTok{the\_pswid =}\NormalTok{ durham\_pswid)}
 \end{Highlighting}
 \end{Shaded}
@@ -574,7 +569,8 @@ without considering the volume of treated wastewater in Durham region.
 \CommentTok{\#Precipitation}
 \NormalTok{PreciParams }\OtherTok{\textless{}{-}} \FunctionTok{whatNWISdata}\NormalTok{(}\AttributeTok{siteNumbers =} \StringTok{"355852078572045"}\NormalTok{)}
 \NormalTok{DurhamPrecipitaion }\OtherTok{\textless{}{-}} \FunctionTok{readNWISdv}\NormalTok{(}\AttributeTok{siteNumbers =} \StringTok{"355852078572045"}\NormalTok{,}
-                                 \AttributeTok{parameterCd =} \StringTok{"00045"}\NormalTok{, }\CommentTok{\# precipitation (inches)}
+                                 \AttributeTok{parameterCd =} \StringTok{"00045"}\NormalTok{, }
+                                 \CommentTok{\# precipitation (inches)}
                                  \AttributeTok{statCd =} \StringTok{"00006"}\NormalTok{,}
                                  \AttributeTok{startDate =} \StringTok{"2009{-}01{-}01"}\NormalTok{,}
                                  \AttributeTok{endDate =} \StringTok{"2021{-}12{-}31"}\NormalTok{)}
@@ -627,13 +623,18 @@ without considering the volume of treated wastewater in Durham region.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{CapeFearRiver\_timeseries }\OtherTok{\textless{}{-}} \FunctionTok{ts}\NormalTok{(CapeFearRiverDischarge\_Monthly}\SpecialCharTok{$}\NormalTok{Mean\_CapeFear\_Discharge\_Bymonth, }\AttributeTok{frequency =} \DecValTok{12}\NormalTok{,}\AttributeTok{start =} \FunctionTok{c}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{end =} \FunctionTok{c}\NormalTok{(}\DecValTok{2021}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\NormalTok{CapeFearRiver\_timeseries }\OtherTok{\textless{}{-}} \FunctionTok{ts}\NormalTok{(CapeFearRiverDischarge\_Monthly}\SpecialCharTok{$}\NormalTok{Mean\_CapeFear\_Discharge\_Bymonth, }
+                        \AttributeTok{frequency =} \DecValTok{12}\NormalTok{,}\AttributeTok{start =} \FunctionTok{c}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{end =} \FunctionTok{c}\NormalTok{(}\DecValTok{2021}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{1}\NormalTok{))}
 \NormalTok{CapeFearRiver\_Decomposed }\OtherTok{\textless{}{-}} \FunctionTok{stl}\NormalTok{(CapeFearRiver\_timeseries, }\AttributeTok{s.window =} \StringTok{"periodic"}\NormalTok{)}
 \FunctionTok{plot}\NormalTok{(CapeFearRiver\_Decomposed)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Project_files/figure-latex/time-series analysis on Regular Water Resources-1.pdf}
+\begin{figure}
+\centering
+\includegraphics{Project_files/figure-latex/Cap Fear Time serries-1.pdf}
+\caption{Cap Fear Time Seiries}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -691,14 +692,19 @@ without considering the volume of treated wastewater in Durham region.
 \begin{Highlighting}[]
 \CommentTok{\#p{-}value is 0.3233, so there is no trend present in Cape Fear River.}
 
-\NormalTok{FlatRiver\_timeseries }\OtherTok{\textless{}{-}} \FunctionTok{ts}\NormalTok{(FlatRiverDischarge\_Monthly}\SpecialCharTok{$}\NormalTok{Mean\_Flat\_Discharge\_Bymonth, }\AttributeTok{frequency =} \DecValTok{12}\NormalTok{,}
+\NormalTok{FlatRiver\_timeseries }\OtherTok{\textless{}{-}} \FunctionTok{ts}\NormalTok{(FlatRiverDischarge\_Monthly}\SpecialCharTok{$}\NormalTok{Mean\_Flat\_Discharge\_Bymonth, }
+                           \AttributeTok{frequency =} \DecValTok{12}\NormalTok{,}
                            \AttributeTok{start =} \FunctionTok{c}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{end =} \FunctionTok{c}\NormalTok{(}\DecValTok{2021}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{1}\NormalTok{))}
 \NormalTok{FlatRiver\_Decomposed }\OtherTok{\textless{}{-}} \FunctionTok{stl}\NormalTok{(FlatRiver\_timeseries, }\AttributeTok{s.window =} \StringTok{"periodic"}\NormalTok{)}
 \FunctionTok{plot}\NormalTok{(FlatRiver\_Decomposed)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Project_files/figure-latex/time-series analysis on Regular Water Resources-2.pdf}
+\begin{figure}
+\centering
+\includegraphics{Project_files/figure-latex/Cap Fear Time serries-2.pdf}
+\caption{Cap Fear Time Seiries}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -755,15 +761,25 @@ without considering the volume of treated wastewater in Durham region.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\#p{-}value is 0.3968, so there is no trend present in Flat River.}
+\end{Highlighting}
+\end{Shaded}
 
-\NormalTok{LittleRiver\_timeseries }\OtherTok{\textless{}{-}} \FunctionTok{ts}\NormalTok{(LittleRiverDischarge\_Monthly}\SpecialCharTok{$}\NormalTok{Mean\_Little\_Discharge\_Bymonth, }\AttributeTok{frequency =} \DecValTok{12}\NormalTok{,}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{LittleRiver\_timeseries }\OtherTok{\textless{}{-}} 
+      \FunctionTok{ts}\NormalTok{(LittleRiverDischarge\_Monthly}\SpecialCharTok{$}\NormalTok{Mean\_Little\_Discharge\_Bymonth, }
+      \AttributeTok{frequency =} \DecValTok{12}\NormalTok{,}
                            \AttributeTok{start =} \FunctionTok{c}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{end =} \FunctionTok{c}\NormalTok{(}\DecValTok{2021}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{1}\NormalTok{))}
 \NormalTok{LittleRiver\_Decomposed }\OtherTok{\textless{}{-}} \FunctionTok{stl}\NormalTok{(LittleRiver\_timeseries, }\AttributeTok{s.window =} \StringTok{"periodic"}\NormalTok{)}
 \FunctionTok{plot}\NormalTok{(LittleRiver\_Decomposed)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Project_files/figure-latex/time-series analysis on Regular Water Resources-3.pdf}
+\begin{figure}
+\centering
+\includegraphics{Project_files/figure-latex/Little River Time Series-1.pdf}
+\caption{Little River Time Series}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -820,7 +836,13 @@ without considering the volume of treated wastewater in Durham region.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\#p{-}value is 0.4073, so there is no trend present in Little River.}
-\CommentTok{\#The time{-}series analysis on Cape Fear Lake, Flat River and Little River do not show any obvious trend in long term. However, we can tell a great similarity between the trend patterns of Cape Fear Lake and Flat River. This raises our concern because they do not come from the same basin. Instead, Little River, which comes from the same watershed as Flat River, shows a more different pattern.}
+\CommentTok{\#The time{-}series analysis on Cape Fear Lake, Flat River and Little River }
+\CommentTok{\#do not show any obvious trend in long term. }
+\CommentTok{\#However, we can tell a great similarity between the trend patterns of}
+\CommentTok{\#Cape Fear Lake and Flat River. This raises our concern because }
+\CommentTok{\#they do not come from the same basin. Instead, Little River, }
+\CommentTok{\#which comes from the same watershed as Flat River, }
+\CommentTok{\#shows a more different pattern.}
 \end{Highlighting}
 \end{Shaded}
 
@@ -834,7 +856,11 @@ without considering the volume of treated wastewater in Durham region.
 \end{Highlighting}
 \end{Shaded}
 
+\begin{figure}
+\centering
 \includegraphics{Project_files/figure-latex/time-series analysis on withdrawals-1.pdf}
+\caption{Total Withdraw Time Series}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -891,7 +917,9 @@ without considering the volume of treated wastewater in Durham region.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\#p{-}value is 0.3775, so there is no trend present in Total Withdrawals.}
-\CommentTok{\#The time{-}series analysis on municipal withdrawals in Durham shows an obvious increase since 2010. However, the drop in 2019 and 2021 needs more data and reports to explain. }
+\CommentTok{\#The time{-}series analysis on municipal withdrawals in Durham shows }
+\CommentTok{\#an obvious increase since 2010. However, the drop in 2019 and 2021 }
+\CommentTok{\#needs more data and reports to explain. }
 \end{Highlighting}
 \end{Shaded}
 
@@ -904,7 +932,11 @@ without considering the volume of treated wastewater in Durham region.
 \end{Highlighting}
 \end{Shaded}
 
+\begin{figure}
+\centering
 \includegraphics{Project_files/figure-latex/time-series analysis on groundwater-1.pdf}
+\caption{Groundwater Time Series}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -961,7 +993,8 @@ without considering the volume of treated wastewater in Durham region.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\#p{-}value is less than 0.05, so there is no trend present in Total Withdrawals.}
-\CommentTok{\#The time{-}series analysis on groundwater table level in Durham shows a significant decrease since 2010. }
+\CommentTok{\#The time{-}series analysis on groundwater table level in Durham shows a }
+\CommentTok{\#significant decrease since 2010. }
 \end{Highlighting}
 \end{Shaded}
 
@@ -974,7 +1007,11 @@ without considering the volume of treated wastewater in Durham region.
 \end{Highlighting}
 \end{Shaded}
 
+\begin{figure}
+\centering
 \includegraphics{Project_files/figure-latex/time-series analysis on precipitation-1.pdf}
+\caption{Precipitation Time Series}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1030,7 +1067,8 @@ without considering the volume of treated wastewater in Durham region.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\#The time{-}series analysis on precipitation in Durham shows a gradual rise since 2010 and a dynamic increase in recent years. }
+\CommentTok{\#The time{-}series analysis on precipitation in Durham shows a gradual rise }
+\CommentTok{\#since 2010 and a dynamic increase in recent years. }
 \end{Highlighting}
 \end{Shaded}
 
@@ -1062,7 +1100,8 @@ without considering the volume of treated wastewater in Durham region.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mod1 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Precipitaion\_inches }\SpecialCharTok{\textasciitilde{}}\NormalTok{ CapeFear\_Discharge }\SpecialCharTok{+}\NormalTok{ Flat\_Discharge }\SpecialCharTok{+}\NormalTok{ Little\_Discharge, }\AttributeTok{data =}\NormalTok{ data1)}
+\NormalTok{mod1 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Precipitaion\_inches }\SpecialCharTok{\textasciitilde{}}\NormalTok{ CapeFear\_Discharge }\SpecialCharTok{+}\NormalTok{ Flat\_Discharge }\SpecialCharTok{+} 
+\NormalTok{             Little\_Discharge, }\AttributeTok{data =}\NormalTok{ data1)}
 \FunctionTok{summary}\NormalTok{(mod1)}
 \end{Highlighting}
 \end{Shaded}
@@ -1099,7 +1138,11 @@ without considering the volume of treated wastewater in Durham region.
 \end{Highlighting}
 \end{Shaded}
 
+\begin{figure}
+\centering
 \includegraphics{Project_files/figure-latex/river discharge and precipitation-1.pdf}
+\caption{Model 1 Diagnostic Graphs}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1132,7 +1175,8 @@ without considering the volume of treated wastewater in Durham region.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mod2}\FloatTok{.1} \OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Mean\_Avg\_Daily\_Use\_mgd }\SpecialCharTok{\textasciitilde{}}\NormalTok{ CapeFear\_Discharge }\SpecialCharTok{+}\NormalTok{ Flat\_Discharge }\SpecialCharTok{+}\NormalTok{ Little\_Discharge, }\AttributeTok{data =}\NormalTok{ data2)}
+\NormalTok{mod2}\FloatTok{.1} \OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Mean\_Avg\_Daily\_Use\_mgd }\SpecialCharTok{\textasciitilde{}}\NormalTok{ CapeFear\_Discharge }\SpecialCharTok{+}\NormalTok{ Flat\_Discharge }\SpecialCharTok{+} 
+\NormalTok{               Little\_Discharge, }\AttributeTok{data =}\NormalTok{ data2)}
 \FunctionTok{summary}\NormalTok{(mod2}\FloatTok{.1}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -1226,7 +1270,11 @@ without considering the volume of treated wastewater in Durham region.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Project_files/figure-latex/river discharge and withdraws-1.pdf}
+\begin{figure}
+\centering
+\includegraphics{Project_files/figure-latex/river discharge and withdraws,-1.pdf}
+\caption{Model 2.1 Diagnostic Graphs}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1280,7 +1328,11 @@ without considering the volume of treated wastewater in Durham region.
 \end{Highlighting}
 \end{Shaded}
 
+\begin{figure}
+\centering
 \includegraphics{Project_files/figure-latex/groundwater and precipitation-1.pdf}
+\caption{Model 3 Diagnostic Graphs}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1331,7 +1383,11 @@ without considering the volume of treated wastewater in Durham region.
 \end{Highlighting}
 \end{Shaded}
 
+\begin{figure}
+\centering
 \includegraphics{Project_files/figure-latex/groundwater and withdraws-1.pdf}
+\caption{Model 4 Diagnostic Graphs}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1347,7 +1403,11 @@ without considering the volume of treated wastewater in Durham region.
 ## `geom_smooth()` using formula 'y ~ x'
 \end{verbatim}
 
-\includegraphics{Project_files/figure-latex/groundwater and withdraws-2.pdf}
+\begin{figure}
+\centering
+\includegraphics{Project_files/figure-latex/m4-1.pdf}
+\caption{Average Daily Water Use vs.~Groundwater Table}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1374,7 +1434,8 @@ without considering the volume of treated wastewater in Durham region.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mod5}\FloatTok{.1} \OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Groundwater\_Table\_feet }\SpecialCharTok{\textasciitilde{}}\NormalTok{ CapeFear\_Discharge }\SpecialCharTok{+}\NormalTok{ Flat\_Discharge }\SpecialCharTok{+}\NormalTok{ Little\_Discharge, }\AttributeTok{data =}\NormalTok{ data5)}
+\NormalTok{mod5}\FloatTok{.1} \OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Groundwater\_Table\_feet }\SpecialCharTok{\textasciitilde{}}\NormalTok{ CapeFear\_Discharge }\SpecialCharTok{+}\NormalTok{ Flat\_Discharge }\SpecialCharTok{+} 
+\NormalTok{               Little\_Discharge, }\AttributeTok{data =}\NormalTok{ data5)}
 \FunctionTok{summary}\NormalTok{(mod5}\FloatTok{.1}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -1442,7 +1503,11 @@ without considering the volume of treated wastewater in Durham region.
 \end{Highlighting}
 \end{Shaded}
 
+\begin{figure}
+\centering
 \includegraphics{Project_files/figure-latex/groundwater and river discharge-1.pdf}
+\caption{Model 5.2 Diagnostic Graphs}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1462,7 +1527,11 @@ without considering the volume of treated wastewater in Durham region.
 ## Warning: Removed 5 rows containing missing values (geom_point).
 \end{verbatim}
 
-\includegraphics{Project_files/figure-latex/groundwater and river discharge-2.pdf}
+\begin{figure}
+\centering
+\includegraphics{Project_files/figure-latex/m5.2-1.pdf}
+\caption{Groundwater table vs.~River Discharge}
+\end{figure}
 
 \newpage
 

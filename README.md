@@ -21,11 +21,14 @@ Data scraped by Yikai Jing from USGS (Precipitation, Discharge: Cape Fear River,
 
 ## Folder structure, file formats, and naming conventions 
 
-<describe the folders contained in the repository, including what type of files they contain>
 Codes: Contains r markdown file where analysis occurs;
+
 Info: instruction for the project;
-Data: in the format of csv files; we do not have a Raw since the data was scraped.
+
+Data: in the format of csv files; we do not have a Raw since the data was scraped;
+
 Processed : any final or intermediate products from the analysis;
+
 Output: contains deliverables including Powerpoint presentation and report as a Word document.
 
 ## Metadata
@@ -34,9 +37,13 @@ Output: contains deliverables including Powerpoint presentation and report as a 
 
 The three discharge datasets all contain the same information: 	
 agency_cd (USGS)
+
 site_no
+
 Date
+
 Discharge (ft3/s)
+
 Approval.Code
 
 ## Scripts and code

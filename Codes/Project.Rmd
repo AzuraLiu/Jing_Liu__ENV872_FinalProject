@@ -15,6 +15,12 @@ mainfont: Times New Roman
 
 \newpage
 \tableofcontents 
+Rationale and Research Questions
+Dataset Information
+Exploratory Analysis
+Analysis
+Summary and Conclusions
+References
 
 
 \newpage
@@ -295,8 +301,7 @@ head(DurhamPrecipitaion)
 # Analysis
 
 ```{r time-series analysis on Regular Water Resources}
-CapeFearRiver_timeseries <- ts(CapeFearRiverDischarge_Monthly$Mean_Discharge_Bymonth, frequency = 12,
-                           start = c(1990, 1, 1), end = c(2021, 12, 1))
+CapeFearRiver_timeseries <- ts(CapeFearRiverDischarge_Monthly$Mean_CapeFear_Discharge_Bymonth, frequency = 12,start = c(1990, 1, 1), end = c(2021, 12, 1))
 CapeFearRiver_Decomposed <- stl(CapeFearRiver_timeseries, s.window = "periodic")
 plot(CapeFearRiver_Decomposed)
 
@@ -305,7 +310,7 @@ CapeFearRiver_trend
 summary(CapeFearRiver_trend)
 #p-value is 0.3233, so there is no trend present in Cape Fear River.
 
-FlatRiver_timeseries <- ts(FlatRiverDischarge_Monthly$Mean_Discharge_Bymonth, frequency = 12,
+FlatRiver_timeseries <- ts(FlatRiverDischarge_Monthly$Mean_Flat_Discharge_Bymonth, frequency = 12,
                            start = c(1990, 1, 1), end = c(2021, 12, 1))
 FlatRiver_Decomposed <- stl(FlatRiver_timeseries, s.window = "periodic")
 plot(FlatRiver_Decomposed)
@@ -315,7 +320,7 @@ FlatRiver_trend
 summary(FlatRiver_trend)
 #p-value is 0.3968, so there is no trend present in Flat River.
 
-LittleRiver_timeseries <- ts(LittleRiverDischarge_Monthly$Mean_Discharge_Bymonth, frequency = 12,
+LittleRiver_timeseries <- ts(LittleRiverDischarge_Monthly$Mean_Little_Discharge_Bymonth, frequency = 12,
                            start = c(1990, 1, 1), end = c(2021, 12, 1))
 LittleRiver_Decomposed <- stl(LittleRiver_timeseries, s.window = "periodic")
 plot(LittleRiver_Decomposed)
